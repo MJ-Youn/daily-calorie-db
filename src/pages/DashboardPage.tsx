@@ -81,26 +81,38 @@ export const DashboardPage: React.FC = () => {
     const fetchStats = React.useCallback(async () => {
         try {
             const res = await fetch(`/api/stats/summary?range=${statsRange}`);
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                console.error('[Dashboard] Failed to fetch stats:', res.status, res.statusText, errData);
+                throw new Error(`Stats fetch failed: ${res.status}`);
+            }
             const data = await res.json();
             if (data.stats) {
                 setStatsData(data.stats);
             }
-        } catch {
-            // 통계 조회 실패 시 아무것도 하지 않음
+        } catch (error) {
+            console.error('[Dashboard] Error fetching stats:', error);
         }
     }, [statsRange]);
 
     const fetchLogs = React.useCallback(async () => {
         try {
             const res = await fetch(`/api/logs/list?date=${selectedDate}`);
+            if (!res.ok) {
+                const errData = await res.json().catch(() => ({}));
+                console.error('[Dashboard] Failed to fetch logs:', res.status, res.statusText, errData);
+                // 사용자에게 시각적 피드백 제공 (선택적)
+                // alert('데이터를 불러오는 중 오류가 발생했습니다. 콘솔을 확인해주세요.'); 
+                throw new Error(`Logs fetch failed: ${res.status}`);
+            }
             const data = await res.json();
             if (data.logs) {
                 setLogs(data.logs);
             }
 
             fetchStats();
-        } catch {
-            // 로그 조회 실패 시 아무것도 하지 않음
+        } catch (error) {
+            console.error('[Dashboard] Error fetching logs:', error);
         }
     }, [selectedDate, fetchStats]);
 
