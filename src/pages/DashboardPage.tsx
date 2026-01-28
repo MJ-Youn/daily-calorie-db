@@ -61,7 +61,7 @@ export const DashboardPage: React.FC = () => {
     const [statsData, setStatsData] = useState<StatData[]>([]);
     const [viewMode, setViewMode] = useState<'LOG' | 'STATS' | 'ADMIN'>('LOG');
     const [statsRange, setStatsRange] = useState<'7' | '30' | 'ALL'>('ALL');
-    const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+    const [selectedDate, setSelectedDate] = useState(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(new Date()));
     const bulkInputRef = React.useRef<HTMLTextAreaElement>(null);
 
     // Derived state to check if we have any input
@@ -117,15 +117,15 @@ export const DashboardPage: React.FC = () => {
     const handlePrevDate = () => {
         const d = new Date(selectedDate);
         d.setDate(d.getDate() - 1);
-        setSelectedDate(d.toISOString().split('T')[0]);
+        setSelectedDate(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(d));
     };
 
     const handleNextDate = () => {
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(new Date());
         if (selectedDate < today) {
             const d = new Date(selectedDate);
             d.setDate(d.getDate() + 1);
-            setSelectedDate(d.toISOString().split('T')[0]);
+            setSelectedDate(new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(d));
         }
     };
 

@@ -51,19 +51,22 @@ export const onRequestGet = async (context: { request: Request; env: Env }): Pro
     }
 
     try {
-        // 2. D1 데이터베이스에서 통계 정보 조회
-        const endDate = new Date();
-        const startDate = new Date();
-
+        // 2. D1 데이터베이스에서 통계 정보 조회 (KST 기준)
+        const dtf = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' });
+        const now = new Date();
+        const kstDateStr = dtf.format(now);
+        
+        const endDate = new Date(kstDateStr);
+        const startDate = new Date(kstDateStr);
+        
         if (range === 'ALL') {
-             // 전체 조회를 위해 아주 오래된 날짜 설정
              startDate.setFullYear(2000, 0, 1); 
         } else {
              startDate.setDate(endDate.getDate() - parseInt(range));
         }
 
-        const startStr = startDate.toISOString().split('T')[0];
-        const endStr = endDate.toISOString().split('T')[0];
+        const startStr = dtf.format(startDate);
+        const endStr = dtf.format(endDate);
 
         const query = `
       SELECT 
@@ -78,7 +81,10 @@ export const onRequestGet = async (context: { request: Request; env: Env }): Pro
 
         const { results } = await env.DB.prepare(query).bind(userId, startStr, endStr).all();
 
-        return new Response(JSON.stringify({ stats: results }), {
+        return new Response(JSON.stringify({ 
+            stats: results,
+            _debug: { userId, startStr, endStr, kstNow: kstDateStr }
+        }), {
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (error: unknown) {
