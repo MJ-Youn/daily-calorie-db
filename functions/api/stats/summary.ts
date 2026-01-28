@@ -33,9 +33,9 @@ export const onRequestGet = async (context: { request: Request; env: Env }): Pro
         return new Response('Unauthorized', { status: 401 });
     }
 
-    const cookies = Object.fromEntries(cookieHeader.split('; ').map((c) => {
-        return c.split('=') as [string, string];
-    }));
+    const cookies = Object.fromEntries(
+        (cookieHeader || '').split(';').map((c) => c.trim().split('='))
+    );
     const token = cookies['auth_token'];
     if (!token) {
         return new Response('Unauthorized', { status: 401 });

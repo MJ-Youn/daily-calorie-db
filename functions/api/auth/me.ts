@@ -28,9 +28,9 @@ export async function getSession(request: Request, env: Env): Promise<UserPayloa
         return null;
     }
 
-    const cookies = Object.fromEntries(cookieHeader.split('; ').map((c) => {
-        return c.split('=');
-    }));
+    const cookies = Object.fromEntries(
+        (cookieHeader || '').split(';').map((c) => c.trim().split('='))
+    );
     const token = cookies['auth_token'];
     if (!token) {
         return null;
