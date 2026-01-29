@@ -1,4 +1,5 @@
 import React from 'react';
+import { formatDate } from '../lib/dateUtils';
 import { Card } from './ui';
 import { Utensils, Activity, Flame } from 'lucide-react';
 
@@ -52,7 +53,7 @@ export const StatsTable: React.FC<StatsTableProps> = ({ data }) => {
                                 key={item.recorded_date}
                                 className="hover:bg-gray-50/50 dark:hover:bg-slate-800/20 transition-colors"
                             >
-                                <td className="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">{new Date(item.recorded_date).toLocaleDateString('ko-KR', { month: 'long', day: 'numeric', weekday: 'short' })}</td>
+                                <td className="px-4 py-3 text-gray-900 dark:text-gray-100 font-medium">{formatDate(item.recorded_date, { month: 'long', day: 'numeric', weekday: 'short' })}</td>
                                 <td className="px-4 py-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{item.total_intake.toLocaleString()}</td>
                                 <td className="px-4 py-3 text-right tabular-nums text-gray-700 dark:text-gray-300">{item.total_exercise.toLocaleString()}</td>
                                 <td className="px-4 py-3 text-right tabular-nums font-bold text-gray-900 dark:text-gray-100">{item.net_calories.toLocaleString()}</td>

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { cn } from '../lib/utils';
+import { formatDate } from '../lib/dateUtils';
 import { Card } from './ui';
 import { Users, FileText, Activity, ExternalLink, Search as SearchIcon } from 'lucide-react';
 import { APP_VERSION } from '../constants';
@@ -198,7 +199,7 @@ export const AdminDashboard: React.FC = () => {
                                                 {log.type}
                                             </span>
                                         </div>
-                                        <div className="px-3 py-2 text-gray-400 dark:text-gray-500 text-[10px]">{new Date(log.recorded_date).toLocaleDateString()}</div>
+                                        <div className="px-3 py-2 text-gray-400 dark:text-gray-500 text-[10px]">{formatDate(log.recorded_date)}</div>
                                     </div>
                                 ))
                             )}

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { cn } from '../lib/utils';
+import { formatTime } from '../lib/dateUtils';
 import { Card, Button } from '../components/ui';
 import { StatsChart } from '../components/StatsChart';
 import { AdminDashboard } from '../components/AdminDashboard';
@@ -789,12 +790,7 @@ export const DashboardPage: React.FC = () => {
                                                     </div>
                                                     <div className="flex items-center gap-2 shrink-0">
                                                         <span className="text-[10px] text-gray-400 dark:text-slate-500 font-mono">
-                                                            {new Date(log.created_at).toLocaleTimeString('ko-KR', {
-                                                                timeZone: 'Asia/Seoul',
-                                                                hour: '2-digit',
-                                                                minute: '2-digit',
-                                                                hour12: false,
-                                                            })}
+                                                            {formatTime(log.created_at)}
                                                         </span>
                                                         <button
                                                             onClick={() => handleDelete(log.id)}
