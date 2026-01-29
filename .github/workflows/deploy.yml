@@ -26,7 +26,7 @@ jobs:
         run: npm run build
 
       - name: Enable Pages config (Deployment Only)
-        run: sed -i 's/# pages_build_output_dir/pages_build_output_dir/g' wrangler.toml
+        run: echo 'pages_build_output_dir = "dist"' >> wrangler.toml
 
       - name: Deploy to Cloudflare Pages
         run: npx wrangler pages deploy --project-name=daily-calorie-log
