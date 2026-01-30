@@ -7,6 +7,7 @@ import { Card, Button } from '../components/ui';
 import { StatsChart } from '../components/StatsChart';
 import { AdminDashboard } from '../components/AdminDashboard';
 import { StatsTable } from '../components/StatsTable';
+import { DynamicIcon } from '../components/DynamicIcon';
 import { Send, Utensils, Activity, LogOut, CheckCircle, BarChart3, List, ShieldAlert, Sun, Moon, Trash2, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Log {
@@ -202,6 +203,15 @@ export const DashboardPage: React.FC = () => {
         }
     };
 
+    const handleTextareaKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            e.preventDefault();
+            if (hasAnyInput && !isAnalyzing) {
+                handleAnalyze();
+            }
+        }
+    };
+
     React.useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -328,20 +338,25 @@ export const DashboardPage: React.FC = () => {
         { value: 'OTHER', label: '기타' },
     ];
 
+    const [imageError, setImageError] = useState(false);
+
+    // ... (existing code)
+
     return (
         <div className="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors duration-300">
             {/* Header */}
             <header className="bg-white/60 dark:bg-gray-900/60 backdrop-blur-md border-b dark:border-gray-800 sticky top-0 z-50 transition-colors duration-300">
                 <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        {user?.picture ? (
+                        {user?.picture && !imageError ? (
                             <img
                                 src={user.picture}
                                 alt={user.name}
                                 className="w-10 h-10 rounded-full border-2 border-primary/20"
+                                onError={() => setImageError(true)}
                             />
                         ) : (
-                            <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">{user?.name?.[0]}</div>
+                            <div className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold">{user?.name?.[0] || 'U'}</div>
                         )}
                         <div>
                             <h1 className="font-bold text-lg leading-tight dark:text-white">안녕하세요, {user?.name}님</h1>
@@ -516,7 +531,8 @@ export const DashboardPage: React.FC = () => {
                                             e.target.style.height = 'auto';
                                             e.target.style.height = e.target.scrollHeight + 'px';
                                         }}
-                                        rows={2}
+                                                    rows={2}
+                                                    onKeyDown={handleTextareaKeyDown}
                                         ref={bulkInputRef}
                                         placeholder={`아침: 사과 1개, 계란 2개\n점심: 김치찌개\n저녁 운동: 런닝 30분\n...`}
                                         className="w-full min-h-[3.5rem] resize-none border-none focus:ring-0 bg-transparent text-sm placeholder:text-gray-400 dark:text-white dark:placeholder:text-gray-600 overflow-hidden"
@@ -570,7 +586,8 @@ export const DashboardPage: React.FC = () => {
                                                         e.target.style.height = 'auto';
                                                         e.target.style.height = e.target.scrollHeight + 'px';
                                                     }}
-                                                    rows={2}
+                                                                rows={2}
+                                                    onKeyDown={handleTextareaKeyDown}
                                                     placeholder={field.placeholder}
                                                     className="w-full min-h-[3rem] p-2 bg-gray-50 dark:bg-gray-800 border-gray-100 dark:border-gray-700 focus:ring-0 focus:border-orange-500 dark:focus:border-orange-500 transition-all resize-none text-sm overflow-hidden border"
                                                 />
@@ -777,7 +794,11 @@ export const DashboardPage: React.FC = () => {
                                                                 log.type === 'FOOD' ? 'bg-orange-50 dark:bg-orange-900/20 text-orange-500 dark:text-orange-400' : 'bg-purple-50 dark:bg-purple-900/20 text-purple-500 dark:text-purple-400',
                                                             )}
                                                         >
-                                                            {log.type === 'FOOD' ? <Utensils className="w-4 h-4" /> : <Activity className="w-4 h-4" />}
+                                                            <DynamicIcon
+                                                                type={log.type}
+                                                                content={log.content}
+                                                                className="w-4 h-4"
+                                                            />
                                                         </div>
                                                         <div className="min-w-0">
                                                             <p className="font-bold text-sm text-gray-900 dark:text-slate-100 truncate">{log.content}</p>
@@ -789,9 +810,7 @@ export const DashboardPage: React.FC = () => {
                                                         </div>
                                                     </div>
                                                     <div className="flex items-center gap-2 shrink-0">
-                                                        <span className="text-[10px] text-gray-400 dark:text-slate-500 font-mono">
-                                                            {formatTime(log.created_at)}
-                                                        </span>
+                                                        <span className="text-[10px] text-gray-400 dark:text-slate-500 font-mono">{formatTime(log.created_at)}</span>
                                                         <button
                                                             onClick={() => handleDelete(log.id)}
                                                             className="p-1.5 text-gray-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"

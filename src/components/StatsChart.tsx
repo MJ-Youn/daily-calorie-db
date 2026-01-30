@@ -161,6 +161,19 @@ export const StatsChart: React.FC<StatsProps> = ({ data, isDarkMode = false }) =
                                 boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
                                 backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
                                 color: isDarkMode ? '#f3f4f6' : '#111827',
+                                fontSize: '12px',
+                            }}
+                            formatter={(value: number, name: string) => {
+                                let label = name as string;
+                                if (name === 'Intake') label = '섭취';
+                                if (name === 'Exercise') label = '운동';
+                                if (name === 'Net Calories') label = '순칼로리';
+                                return [`${value} kcal`, label];
+                            }}
+                            labelFormatter={(label: string) => {
+                                // label is 'YYYY-MM-DD'
+                                const [y, m, d] = label.split('-');
+                                return `${y}년 ${m}월 ${d}일`;
                             }}
                         />
                         {visibility.intake && (

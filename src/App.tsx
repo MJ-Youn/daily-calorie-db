@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { LoginPage } from './pages/LoginPage';
+import { VerifyPage } from './pages/VerifyPage';
 import { ProtectedRoute } from './components/ProtectedRoute';
 
 import { DashboardPage } from './pages/DashboardPage';
@@ -25,6 +26,10 @@ function App() {
                                 <Route
                                     path="/"
                                     element={<LoginPage />}
+                                />
+                                <Route
+                                    path="/verify"
+                                    element={<VerifyPage />}
                                 />
                                 <Route
                                     path="/dashboard"

@@ -3,4 +3,4 @@
  */
 
 // 앱 버전 정보
-export const APP_VERSION = 'v1.3.20260129';
+export const APP_VERSION = 'v1.4.20260130';

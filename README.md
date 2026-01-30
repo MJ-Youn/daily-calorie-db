@@ -117,7 +117,18 @@ npx wrangler pages secret put GEMINI_API_KEY --project-name daily-calorie-log
 ---
 
 ### 📅 마스터 릴리즈 노트
+- **v1.4 (2026-01-30)**: 보안 강화 및 사용성 개선 (Current)
+  - **Security**: Cloudflare Turnstile 도입으로 봇 접근 차단 및 무분별한 API 호출 방지.
+  - **Feature**: 입력창 단축키(`Ctrl+Enter`) 지원으로 빠른 기록 가능.
+  - **UI**: 
+    - 로그 항목의 내용을 분석하여 적절한 아이콘(커피, 런닝 등)을 동적으로 표시.
+    - 통계 차트 툴팁 한글화 및 날짜 포맷 가독성 개선.
+    - 프로필 이미지 로드 실패 시 기본 아바타 표시로 UI 깨짐 방지.
 - **v1.3 (2026-01-29)**: 글로벌 타임존 지원 및 UI 개선
+  - **Feature**: 시스템 타임존(브라우저 설정) 기반의 날짜/시간 자동 변환 지원.
+  - **UI**: 모든 버튼 요소에 마우스 호버 시 포인터 커서(`cursor: pointer`) 적용.
+  - **Refactor**: 날짜 처리 로직 공통 유틸리티(`dateUtils.ts`)로 분리.
+- **v1.2 (2026-01-29)**: UI/UX 전면 개편 및 안정화
   - **Feature**: 시스템 타임존(브라우저 설정) 기반의 날짜/시간 자동 변환 지원.
   - **UI**: 모든 버튼 요소에 마우스 호버 시 포인터 커서(`cursor: pointer`) 적용.
   - **Refactor**: 날짜 처리 로직 공통 유틸리티(`dateUtils.ts`)로 분리.
