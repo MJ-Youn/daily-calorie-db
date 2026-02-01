@@ -81,6 +81,21 @@ export const DashboardPage: React.FC = () => {
     // Use a simple boolean to control visibility if needed, but viewMode 'LOG' is primary.
     const inputsViewMode = viewMode === 'LOG';
 
+    const navigate = useNavigate();
+
+    const protectedFetch = React.useCallback(async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+        const res = await fetch(input, init);
+        if (res.status === 403) {
+            const data = await res.clone().json().catch(() => ({}));
+            if (data.error === 'Human verification required') {
+                const next = encodeURIComponent(window.location.pathname + window.location.search);
+                navigate(`/verify?next=${next}`);
+                throw new Error('VERIFICATION_REQUIRED');
+            }
+        }
+        return res;
+    }, [navigate]);
+
     const handleInputChange = (field: string, value: string) => {
         setInputs((prev) => {
             return { ...prev, [field]: value };
@@ -89,7 +104,7 @@ export const DashboardPage: React.FC = () => {
 
     const fetchStats = React.useCallback(async () => {
         try {
-            const res = await fetch(`/api/stats/summary?range=${statsRange}`);
+            const res = await protectedFetch(`/api/stats/summary?range=${statsRange}`);
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
                 console.error('[Dashboard] Failed to fetch stats:', res.status, res.statusText, errData);
@@ -100,13 +115,15 @@ export const DashboardPage: React.FC = () => {
                 setStatsData(data.stats);
             }
         } catch (error) {
-            console.error('[Dashboard] Error fetching stats:', error);
+            if ((error as Error).message !== 'VERIFICATION_REQUIRED') {
+                console.error('[Dashboard] Error fetching stats:', error);
+            }
         }
-    }, [statsRange]);
+    }, [statsRange, protectedFetch]);
 
     const fetchLogs = React.useCallback(async () => {
         try {
-            const res = await fetch(`/api/logs/list?date=${selectedDate}`);
+            const res = await protectedFetch(`/api/logs/list?date=${selectedDate}`);
             if (!res.ok) {
                 const errData = await res.json().catch(() => ({}));
                 console.error('[Dashboard] Failed to fetch logs:', res.status, res.statusText, errData);
@@ -121,9 +138,11 @@ export const DashboardPage: React.FC = () => {
 
             fetchStats();
         } catch (error) {
-            console.error('[Dashboard] Error fetching logs:', error);
+            if ((error as Error).message !== 'VERIFICATION_REQUIRED') {
+                console.error('[Dashboard] Error fetching logs:', error);
+            }
         }
-    }, [selectedDate, fetchStats]);
+    }, [selectedDate, fetchStats, protectedFetch]);
 
     useEffect(() => {
         fetchLogs();
@@ -150,8 +169,6 @@ export const DashboardPage: React.FC = () => {
         }
     };
 
-    const navigate = useNavigate();
-
     const handleAnalyze = async () => {
         if (!hasAnyInput) return;
 
@@ -177,22 +194,13 @@ export const DashboardPage: React.FC = () => {
         }
 
         try {
-            const res = await fetch('/api/analyze', {
+            const res = await protectedFetch('/api/analyze', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: fullText }),
             });
 
-            const data = await res.json().catch(() => ({}));
-
-            // 403 Human Verification Required 처리
-            // 403 Human Verification Required 처리
-            if (res.status === 403 && data.error === 'Human verification required') {
-                const next = encodeURIComponent(window.location.pathname + window.location.search);
-                navigate(`/verify?next=${next}`);
-                return;
-            }
-
+            const data = await res.json();
             // AI 분석 결과 확인 (개발 단계에서만 사용)
             if (data.error) {
                 throw new Error(data.error);
@@ -210,7 +218,9 @@ export const DashboardPage: React.FC = () => {
                 setAnalyzedData(data);
             }
         } catch (error) {
-            alert('분석 실패: ' + error);
+            if ((error as Error).message !== 'VERIFICATION_REQUIRED') {
+                alert('분석 실패: ' + error);
+            }
         } finally {
             setIsAnalyzing(false);
         }
@@ -246,7 +256,7 @@ export const DashboardPage: React.FC = () => {
                 recorded_date: selectedDate,
             };
 
-            const res = await fetch('/api/logs/batch_create', {
+            const res = await protectedFetch('/api/logs/batch_create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload),
@@ -269,8 +279,10 @@ export const DashboardPage: React.FC = () => {
                 setAnalyzedData(null);
                 fetchLogs();
             }
-        } catch {
-            // 저장 실패 시 처리
+        } catch (error) {
+            if ((error as Error).message !== 'VERIFICATION_REQUIRED') {
+               // 저장 실패 시 처리
+            }
         } finally {
             setIsSaving(false);
         }
@@ -281,7 +293,7 @@ export const DashboardPage: React.FC = () => {
             return;
         }
         try {
-            const res = await fetch('/api/logs/delete', {
+            const res = await protectedFetch('/api/logs/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id }),
@@ -291,8 +303,10 @@ export const DashboardPage: React.FC = () => {
             } else {
                 alert('삭제 실패');
             }
-        } catch {
-            // 삭제 중 오류 발생 시 아무것도 하지 않음
+        } catch (error) {
+             if ((error as Error).message !== 'VERIFICATION_REQUIRED') {
+                // 삭제 중 오류 발생 시 아무것도 하지 않음
+             }
         }
     };
 
